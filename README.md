@@ -58,11 +58,11 @@ docker compose version
 
 ## Clone from GitHub
 
-After the GitHub repository has been created, clone its HTTPS or SSH URL:
+Clone the GitHub repository using its HTTPS URL:
 
 ```bash
-git clone https://github.com/<OWNER>/<REPOSITORY>.git
-cd <REPOSITORY>
+git clone https://github.com/saurabhborate/KafkaCommunication.git
+cd KafkaCommunication
 ```
 
 Then run the build and start commands below from that directory. The repository contains the complete Maven reactor, Docker build files, schemas, scripts, and docs; no generated jars or local databases are required.
