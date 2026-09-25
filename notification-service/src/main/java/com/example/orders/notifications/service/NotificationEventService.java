@@ -1,0 +1,8 @@
+package com.example.orders.notifications.service;
+import com.example.orders.contracts.OrderProcessedEvent; import com.example.orders.notifications.domain.ConsumedEvent; import com.example.orders.notifications.domain.Notification; import com.example.orders.notifications.repository.ConsumedEventRepository; import com.example.orders.notifications.repository.NotificationRepository;
+import java.math.BigDecimal; import java.time.Instant; import java.util.UUID; import org.slf4j.Logger; import org.slf4j.LoggerFactory; import org.springframework.stereotype.Service; import org.springframework.transaction.annotation.Transactional;
+@Service public class NotificationEventService {
+ private static final Logger log=LoggerFactory.getLogger(NotificationEventService.class); private static final BigDecimal LIMIT=new BigDecimal("5000.00"); private final NotificationRepository notifications; private final ConsumedEventRepository consumed;
+ public NotificationEventService(NotificationRepository notifications,ConsumedEventRepository consumed){this.notifications=notifications;this.consumed=consumed;}
+ @Transactional public void accept(OrderProcessedEvent event){if(consumed.existsById(event.eventId())){log.info("Duplicate ORDER_PROCESSED ignored");return;}String payment=event.amount().compareTo(LIMIT)<=0?"PAYMENT_COMPLETED":"PAYMENT_PENDING";Instant now=Instant.now();notifications.save(new Notification("NTF-"+UUID.randomUUID(),event.eventId(),event.orderId(),event.customerId(),event.amount(),payment,now));consumed.save(new ConsumedEvent(event.eventId(),now));log.info("Payment decision recorded paymentStatus={}",payment);}
+}

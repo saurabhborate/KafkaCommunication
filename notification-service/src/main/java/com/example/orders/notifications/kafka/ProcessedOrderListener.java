@@ -1,0 +1,6 @@
+package com.example.orders.notifications.kafka;
+import com.example.orders.contracts.OrderProcessedEvent; import com.example.orders.notifications.service.NotificationEventService; import org.springframework.kafka.annotation.KafkaListener; import org.springframework.stereotype.Component; import tools.jackson.databind.ObjectMapper; import org.slf4j.MDC;
+@Component public class ProcessedOrderListener{
+ private final ObjectMapper mapper;private final NotificationEventService service;public ProcessedOrderListener(ObjectMapper mapper,NotificationEventService service){this.mapper=mapper;this.service=service;}
+ @KafkaListener(topics="${app.kafka.processed-topic}",groupId="notification-service-group") public void receive(String payload)throws Exception{OrderProcessedEvent event=mapper.readValue(payload,OrderProcessedEvent.class);MDC.put("correlationId",event.correlationId());MDC.put("eventId",event.eventId());MDC.put("orderId",event.orderId());MDC.put("eventType",event.eventType());try{if(!OrderProcessedEvent.TYPE.equals(event.eventType())||event.eventVersion()<1||!OrderProcessedEvent.PROCESSED.equals(event.processingStatus())||event.amount()==null||event.amount().signum()<=0)throw new IllegalArgumentException("Invalid or unsupported ORDER_PROCESSED event");service.accept(event);}finally{MDC.clear();}}
+}

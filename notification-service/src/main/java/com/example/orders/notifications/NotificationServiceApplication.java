@@ -1,0 +1,3 @@
+package com.example.orders.notifications;
+import org.springframework.boot.SpringApplication; import org.springframework.boot.autoconfigure.SpringBootApplication;
+@SpringBootApplication(scanBasePackages="com.example.orders") public class NotificationServiceApplication { public static void main(String[] args){SpringApplication.run(NotificationServiceApplication.class,args);} }

@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS notifications(notification_id VARCHAR(64) PRIMARY KEY,event_id VARCHAR(64) NOT NULL UNIQUE,order_id VARCHAR(64) NOT NULL,customer_id VARCHAR(128) NOT NULL,amount DECIMAL(19,2) NOT NULL,payment_status VARCHAR(32) NOT NULL,notification_status VARCHAR(32) NOT NULL,created_at TIMESTAMP WITH TIME ZONE NOT NULL,updated_at TIMESTAMP WITH TIME ZONE NOT NULL);
+CREATE INDEX IF NOT EXISTS idx_notifications_order ON notifications(order_id);
+CREATE TABLE IF NOT EXISTS consumed_events(event_id VARCHAR(64) PRIMARY KEY,consumed_at TIMESTAMP WITH TIME ZONE NOT NULL);

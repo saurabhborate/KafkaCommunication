@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS orders (
+ order_id VARCHAR(64) PRIMARY KEY, customer_id VARCHAR(128) NOT NULL, product VARCHAR(255) NOT NULL,
+ quantity INTEGER NOT NULL CHECK (quantity > 0), amount DECIMAL(19,2) NOT NULL CHECK (amount > 0),
+ status VARCHAR(32) NOT NULL, created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+ updated_at TIMESTAMP WITH TIME ZONE NOT NULL, version BIGINT NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS consumed_events (event_id VARCHAR(64) PRIMARY KEY, event_type VARCHAR(64) NOT NULL, consumed_at TIMESTAMP WITH TIME ZONE NOT NULL);
+CREATE TABLE IF NOT EXISTS outbox_events (id VARCHAR(64) PRIMARY KEY, aggregate_id VARCHAR(64) NOT NULL, event_type VARCHAR(64) NOT NULL, payload VARCHAR(32000) NOT NULL, correlation_id VARCHAR(128) NOT NULL, state VARCHAR(20) NOT NULL, retry_count INTEGER NOT NULL DEFAULT 0, last_error VARCHAR(1000), created_at TIMESTAMP WITH TIME ZONE NOT NULL, published_at TIMESTAMP WITH TIME ZONE);
+CREATE INDEX IF NOT EXISTS idx_acceptance_outbox_state_created ON outbox_events(state, created_at);

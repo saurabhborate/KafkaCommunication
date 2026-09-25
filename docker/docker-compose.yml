@@ -1,0 +1,87 @@
+name: kafka-order-processing
+
+services:
+  kafka:
+    image: apache/kafka:4.3.1
+    hostname: kafka
+    ports:
+      - "29192:29092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://:9092,CONTROLLER://:9093,EXTERNAL://:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29192
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null 2>&1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 15s
+
+  acceptance-service:
+    build:
+      context: ..
+      dockerfile: acceptance-service/Dockerfile
+    ports:
+      - "18181:8081"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/acceptance_db;DB_CLOSE_ON_EXIT=FALSE
+      SERVER_PORT: 8081
+    volumes:
+      - acceptance-data:/app/data
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  order-service:
+    build:
+      context: ..
+      dockerfile: order-service/Dockerfile
+    ports:
+      - "18183:8083"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/order_db;DB_CLOSE_ON_EXIT=FALSE
+      SERVER_PORT: 8083
+    volumes:
+      - order-data:/app/data
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: ..
+      dockerfile: notification-service/Dockerfile
+    ports:
+      - "18182:8082"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/app/data/notification_db;DB_CLOSE_ON_EXIT=FALSE
+      SERVER_PORT: 8082
+    volumes:
+      - notification-data:/app/data
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  kafka-data:
+  acceptance-data:
+  order-data:
+  notification-data:

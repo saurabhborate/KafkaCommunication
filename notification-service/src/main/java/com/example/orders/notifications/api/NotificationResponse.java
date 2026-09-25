@@ -1,0 +1,3 @@
+package com.example.orders.notifications.api;
+import com.example.orders.notifications.domain.Notification; import java.math.BigDecimal; import java.time.Instant;
+public record NotificationResponse(String notificationId,String eventId,String orderId,String customerId,BigDecimal amount,String paymentStatus,String notificationStatus,Instant createdAt,Instant updatedAt){public static NotificationResponse from(Notification n){return new NotificationResponse(n.getNotificationId(),n.getEventId(),n.getOrderId(),n.getCustomerId(),n.getAmount(),n.getPaymentStatus(),n.getNotificationStatus(),n.getCreatedAt(),n.getUpdatedAt());}}

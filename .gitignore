@@ -1,0 +1,76 @@
+# Java / Maven build output
+target/
+**/target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# Local logs and crash dumps
+*.log
+hs_err_pid*
+replay_pid*
+
+# H2 and other local database files
+data/
+**/data/
+*.mv.db
+*.trace.db
+*.lock.db
+*.db
+*.sqlite
+*.sqlite3
+
+# Runtime state and local Kafka data
+kafka-data/
+**/kafka-data/
+docker-data/
+volumes/
+
+# Environment files and local credentials
+.env
+.env.*
+!.env.example
+*.local
+.secrets/
+secrets/
+credentials/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.truststore
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Eclipse / STS
+.classpath
+.project
+.settings/
+.metadata/
+
+# macOS / Windows
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# Temporary / editor swap files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
